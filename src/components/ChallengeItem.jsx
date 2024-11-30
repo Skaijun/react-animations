@@ -1,6 +1,7 @@
-import { useContext } from 'react';
+import { useContext } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
-import { ChallengesContext } from '../store/challenges-context.jsx';
+import { ChallengesContext } from "../store/challenges-context.jsx";
 
 export default function ChallengeItem({
   challenge,
@@ -10,24 +11,24 @@ export default function ChallengeItem({
   const { updateChallengeStatus } = useContext(ChallengesContext);
 
   const formattedDate = new Date(challenge.deadline).toLocaleDateString(
-    'en-US',
+    "en-US",
     {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     }
   );
 
   function handleCancel() {
-    updateChallengeStatus(challenge.id, 'failed');
+    updateChallengeStatus(challenge.id, "failed");
   }
 
   function handleComplete() {
-    updateChallengeStatus(challenge.id, 'completed');
+    updateChallengeStatus(challenge.id, "completed");
   }
 
   return (
-    <li>
+    <motion.li layout>
       <article className="challenge-item">
         <header>
           <img {...challenge.image} />
@@ -45,20 +46,29 @@ export default function ChallengeItem({
         <div className="challenge-item-details">
           <p>
             <button onClick={onViewDetails}>
-              View Details{' '}
-              <span className="challenge-item-details-icon">&#9650;</span>
+              View Details{" "}
+              <motion.span
+                animate={{ rotate: isExpanded ? 180 : 0 }}
+                className="challenge-item-details-icon">
+                &#9650;
+              </motion.span>
             </button>
           </p>
 
-          {isExpanded && (
-            <div>
-              <p className="challenge-item-description">
-                {challenge.description}
-              </p>
-            </div>
-          )}
+          <AnimatePresence>
+            {isExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}>
+                <p className="challenge-item-description">
+                  {challenge.description}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </article>
-    </li>
+    </motion.li>
   );
 }
